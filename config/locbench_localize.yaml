@@ -1,0 +1,45 @@
+agent:
+  templates:
+    system_template: |-
+      You are a code localization assistant. Your task is to locate relevant files and code entities
+      for the given problem statement. You must not modify files or run tests.
+    instance_template: |-
+      <repo>
+      {{working_dir}}
+      </repo>
+      Repository: {{repo_slug}}
+
+      Problem statement:
+      {{problem_statement}}
+
+      Task:
+      - Identify the most relevant files and functions/classes/variables likely to be edited to fix the issue.
+      - Use only the provided read-only tools to inspect the repo.
+      - Do not create, modify, or delete files.
+
+      Output format (required):
+      Return a single JSON object with these keys:
+      - "found_files": list of file paths relative to repo root (e.g., "package/module.py").
+      - "found_entities": list of entities formatted as "path/to/file.py:Entity", where Entity is
+        a function, class, method, or variable name (e.g., "pkg/mod.py:MyClass.method").
+
+      After printing the JSON object, call the submit tool.
+  tools:
+    env_variables:
+      PAGER: cat
+      MANPAGER: cat
+      LESS: -R
+      PIP_PROGRESS_BAR: 'off'
+      TQDM_DISABLE: '1'
+      GIT_PAGER: cat
+    bundles:
+      - path: tools/search
+      - path: tools/filemap
+      - path: tools/windowed
+      - path: tools/submit
+    enable_bash_tool: false
+    parse_function:
+      type: function_calling
+  history_processors:
+    - type: cache_control
+      last_n_messages: 2
