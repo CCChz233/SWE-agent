@@ -8,6 +8,9 @@ data/**
 *.env
 !tools/*
 
+# Large test data files
+tests/test_data/data_sources/ctf/**/*.zip
+
 # -------- automatically generated files --------
 
 # Byte-compiled / optimized / DLL files
